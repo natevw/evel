@@ -29,7 +29,11 @@ evel._globalNames = function () {
         Object.getOwnPropertyNames(proto).forEach(function (k) { globals[k] = void 0; });
         proto = Object.getPrototypeOf(proto);
     }
-    return Object.keys(globals).filter(function (k) { return !(k in evel._jsGlobals); });
+    // NOTE: every name on global may not be a valid identifier! http://mathiasbynens.be/notes/javascript-identifiers
+    return Object.keys(globals).filter(function (k) {
+        try { Function(k, ""); } catch (e) { return false; }
+        return !(k in evel._jsGlobals);
+    });
 };
 
 evel.Function = function () {
