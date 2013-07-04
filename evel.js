@@ -1,5 +1,5 @@
 var evel = function (code) {
-    return evel.Function(code)();
+    return evel.Function("return ("+code+");")();
 };
 
 evel._supportsStrict = function () {
