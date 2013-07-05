@@ -26,15 +26,23 @@ evel._globalNames = function () {
     var globals = Object.create(null),
         proto = evel._global;
     while (proto) {
+        // NOTE: there are some issues with getOwnPropertyNames, e.g. https://code.google.com/p/v8/issues/detail?id=2764
         Object.getOwnPropertyNames(proto).forEach(function (k) { globals[k] = void 0; });
         proto = Object.getPrototypeOf(proto);
     }
     // NOTE: every name on global may not be a valid identifier! http://mathiasbynens.be/notes/javascript-identifiers
+    var cache = evel._globalNames.memoizedFilterResults;
     return Object.keys(globals).filter(function (k) {
-        try { Function(k, ""); } catch (e) { return false; }
-        return !(k in evel._jsGlobals);
+        if (k in cache) return cache[k];
+        if (window.dbg) console.log('k', k);
+        var valid = (k in evel._jsGlobals) ? false : true;
+        if (valid) try { Function(k, ""); } catch (e) { valid = false; }
+        return (cache[k] = valid);
     });
 };
+evel._globalNames.memoizedFilterResults = Object.create(null);
+evel._globalNames();        // warm the cache
+
 
 evel.Function = function () {
     if (!evel._supportsStrict()) throw Error("This browser does not support sandboxed code execution.");
