@@ -20,7 +20,9 @@ Basically, `evel` provides an `evel` function that works like a `eval` and a `ev
 
 ## Caveats
 
-`evel` only works where ES5 script mode does, and while it masks out all other globals, untrusted code will still have access to JavaScript builtins — and any features you (or the code!!!) might add to their prototypes.
+`evel` only works where ES5 strict mode does, and while it masks out all other globals, untrusted code will still have access to JavaScript builtins — and any features you (or the code!!!) might add to their prototypes.
+
+Also, while I can't think of any other ways to subvert it … maybe someone else will?
 
 ## MIT license
 
