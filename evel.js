@@ -22,9 +22,9 @@ if (0) {        // enable for debugging?
 
 evel._global = function () { return this || window; }.call(null);         // NOTE: we fallback to `window` in case someone puts *us* into strict mode
 
-evel._globalNames = function () {
+evel._globalNames = function (gObj) {
     var globals = Object.create(null),
-        proto = evel._global;
+        proto = gObj || evel._global;
     while (proto) {
         // NOTE: there are some issues with getOwnPropertyNames, e.g. https://code.google.com/p/v8/issues/detail?id=2764
         Object.getOwnPropertyNames(proto).forEach(function (k) { globals[k] = void 0; });
@@ -51,6 +51,7 @@ evel.Function = function () {
         1. Sanitizing the provided source (immediately, which also serves to flag syntax errors at expected time)
         2. Wrapping source in a "use strict";` environment to eliminate global access via `this` tricks
         3. Shadowing all non-ES5 globals† (each time called!) to eliminate direct access via name
+        4. …doing the last two steps from a new iframe's JS environment
     
     Basically instead of returning the provided code directly, we wrap it like this:
     
@@ -63,16 +64,26 @@ evel.Function = function () {
     Note that all bets are off if browser doesn't support strict mode, so we block that.
     
     † IMPORTANT: the untrusted code WILL have access to anything named the same as the normal built-in JavaScript globals!
-    This is both for practical purposes (since said code prolly expects them!) and because blocking them doesn't do much good:
-    we could attempt to provide safer globals e.g. http://dean.edwards.name/weblog/2006/11/hooray/ but there is no sane way to
-    ever prevent access to shared prototypes of e.g. objects/arrays/regexes while still keeping the function calls synchronous. */
+    This is both for practical purposes (since said code prolly expects them!) and because blocking them doesn't do much good;
+    can't prevent access to shared prototypes of e.g. objects/arrays/regexes while still keeping the function calls synchronous.
+    Since we run in a separate frame, this is less likely a problem, but browser add-ons could potentially expose "useful" stuff. */
     
     var src = "\"use strict\"; var fn = "+Function.apply(null, arguments).toString()+"; return fn.apply(this.ctx, this.args);";
     return function () {
         "use strict";       // avoids boxing of this callee's own `this`
-        var wrapper = evel._globalNames();
+        
+        // c.f. http://dean.edwards.name/weblog/2006/11/sandbox/ via https://github.com/substack/vm-browserify/
+        var sbx = document.createElement('iframe');
+        sbx.setAttribute('sandbox', "allow-same-origin");       // need same-origin so *we* can access it!
+        sbx.style.display = 'none';
+        document.documentElement.appendChild(sbx);
+        var _gObj = sbx.contentWindow,
+            _Function = _gObj.Function;
+        document.documentElement.removeChild(sbx);
+        
+        var wrapper = evel._globalNames(_gObj);
         wrapper.push(src);
-        return Function.apply(null, wrapper).call({
+        return _Function.apply(null, wrapper).call({
             ctx: (this !== evel._global) ? this : null,
             args: arguments
         });
