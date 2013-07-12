@@ -18,9 +18,20 @@ evel comes between eval and evil (code)
 
 Basically, `evel` provides an `evel` function that works like a `eval` and a `evel.Function` that works like `Function` — except access to the global environment is somewhat prevented.
 
+Load evel.js in a page a try out each of these lines in the JS console for funsies:
+
+```
+eval("({}).__proto__") === Object.prototype;
+evel("({}).__proto__") === Object.prototype;
+
+evel("eval('alert')");
+evel("eval")('alert');
+```
+
+
 ## Caveats
 
-`evel` only works where ES5 strict mode does, and while it masks out all other globals, untrusted code will still have access to JavaScript builtins — and any features you (or the code!!!) might add to their prototypes.
+`evel` only works where ES5 strict mode does, and while it masks out all other globals, untrusted code will still have access to JavaScript builtins of a "clean" iframe. 
 
 Also, while I can't think of any other ways to subvert it … maybe someone else will?
 
