@@ -68,10 +68,8 @@ Known issues:
         resD = document.getElementsByTagName('div')[0],
         resS = document.getElementsByTagName('span')[0];
     
-    var resultTimeout, runCode
-    form.addEventListener('submit', runCode = function (e) {
+    function runCode(e) {
         if (e) e.preventDefault();
-        clearTimeout(resultTimeout);
         
         var result;
         resS.classList.remove('exception');
@@ -84,16 +82,14 @@ Known issues:
         }
         resS.textContent = ''+result;
         resD.classList.add('active');
-        resultTimeout = setTimeout(function () {
-            resD.classList.remove('active');
-        }, 5000);
-    }, false);
-    
+    }
+    form.addEventListener('submit', runCode, false);
     if (location.hash) {
         text.value = decodeURIComponent(location.hash.slice(1));
-        //form.submit();
         runCode();
     }
+    text.addEventListener('input', function () { resD.classList.remove('active'); }, false);
+    
 </script>
 
 <small>© 2013 Nathan Vander Wilt. See <a href="http://exts.ch/">store</a> for details.</small>
