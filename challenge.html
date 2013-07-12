@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>evel sandbox challenge</title>
+    <script src="evel.js"></script>
+    <style>
+        html { font-family: sans-serif; }
+        body { padding: 2em; }
+        h2 { clear: both; }
+        small { font-style: italic; }
+        form {
+            width: 75%; padding: 2em;
+            border: 1px solid rgb(98,30,16);
+            background: rgb(253,221,41);
+            border-radius: 5px;
+        }
+        textarea { width: 100%; height: 25em; }
+        button { position: relative; left: 45%; }
+        div:not(.active) { display: none; }
+        .result { color: green; }
+        .exception.result { color: red; }
+    </style>
+</head>
+<body>
+
+<figure style="float: left">
+<img src="evelk_by_mwest_.png"><br>
+<small>Illustration by <a href="https://twitter.com/mwest_">Mike West</a></small>
+</figure>
+
+<h1>evel sandbox challenge</h1>
+
+<p>
+<a href="https://github.com/natevw/evel"><b>evel.js</b></a> claims to provide a trustworthy sandbox for running untrusted JavaScript code in modern browsers…
+
+<p style="font-size: 1.75em; color: rgb(188,39,30)">
+…can you prove this wrong?
+
+<h2>The Sandbox</h2>
+<form>
+<textarea placeholder="alert(&quot;mwu-ha-ha-ha!&quot;);"></textarea><br>
+<button>evel()</button>
+<div>Result: <span class=result></span></div>
+</form>
+
+<h2>The Rules</h2>
+
+<ul>
+    <li>Provide code that pops up an <code>alert</code> (or erases the page or causes network activity…) when <code>evel</code>'ed.
+    <li>Any code given in this URL's fragment part (e.g. <code>#prompt("What%20is%20your%20quest?")</code>) will run automatically.
+    <li>Share any holes found in <code>evel</code> via <a href="https://github.com/natevw/evel/issues">github issues</a> <em>unless</em> they are browser vulnerabilities…
+    <li>…for browser-specific bugs please responsibly contact the vendor. Do <a href="http://exts.ch/contact/">let me know</a> something has been filed, please.
+</ul>
+
+<p>
+Known issues:
+
+<ul>
+    <li>JavaScript globals are intentionally exposed, as they should not be exploitable.
+    <li>Can't prevent infinite loops. Credit: <a href="http://dominictarr.com/">Dominic Tarr</a>
+    <li style="font-style: italic">clever exploit here?
+</ul>
+
+<script>
+    var form = document.getElementsByTagName('form')[0],
+        text = document.getElementsByTagName('textarea')[0],
+        resD = document.getElementsByTagName('div')[0],
+        resS = document.getElementsByTagName('span')[0];
+    
+    var resultTimeout, runCode
+    form.addEventListener('submit', runCode = function (e) {
+        if (e) e.preventDefault();
+        clearTimeout(resultTimeout);
+        
+        var result;
+        resS.classList.remove('exception');
+        resD.classList.remove('active');
+        try {
+            result = evel(text.value);
+        } catch (e) {
+            result = e;
+            resS.classList.add('exception');
+        }
+        resS.textContent = result;
+        resD.classList.add('active');
+        resultTimeout = setTimeout(function () {
+            resD.classList.remove('active');
+        }, 5000);
+    }, false);
+    
+    if (location.hash) {
+        text.value = decodeURIComponent(location.hash.slice(1));
+        //form.submit();
+        runCode();
+    }
+</script>
+
+<small>© 2013 Nathan Vander Wilt. See <a href="http://exts.ch/">store</a> for details.</small>
+
+</body>
+</html>
