@@ -21,19 +21,41 @@ Basically, `evel` provides an `evel` function that works like a `eval` and a `ev
 Load evel.js in a page a try out each of these lines in the JS console for funsies:
 
 ```
+// regular `eval` allows access to shared prototypes
 eval("({}).__proto__") === Object.prototype;
+
+// `evel` doesn't
 evel("({}).__proto__") === Object.prototype;
 
+// this returns `undefined`
 evel("eval('alert')");
+
+// but this doesn't!
 evel("eval")('alert');
 ```
 
-
 ## Caveats
 
-`evel` only works where ES5 strict mode does, and while it masks out all other globals, untrusted code will still have access to JavaScript builtins of a "clean" iframe. 
+### `evel` only works where ES5 strict mode does
 
-Also, while I can't think of any other ways to subvert it … maybe someone else will?
+In older browsers, `evel` will always throw an exception rather than running code.
+
+### JavaScript builtins still available
+
+While `evel` masks out all other globals, untrusted code will still have access to JavaScript builtins of a "clean" iframe. This should usually be fine, so long as leaking the user's local and current time is okay for your application, but if a poorly-written browser plugin/extension adds more functionality to JS core this could also be a concern.
+
+### The Halting Problem
+
+Credit: [Dominic Tarr](https://github.com/dominictarr)
+
+A malicious script could `while(true);` and freeze the page. There's [not a lot](http://en.wikipedia.org/wiki/Halting_problem) we could do about this while still allowing syncronous return values. This a denial of service attack: it doesn't directly give the attacker much, but it does break the user experience.
+
+To avoid this, you could design *your* code to work asyncronously and use `evel` from within a communicating iframe or a worker (or even use more robust alternatives on the server-side).
+
+### Unproven
+
+While I can't think of any other ways to subvert it … maybe someone else will think of more?
+
 
 ## MIT license
 
