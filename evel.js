@@ -1,5 +1,6 @@
 var evel = function (code) {
-    return evel.Function("return ("+code+");")();
+    if (typeof code !== 'string') return code;
+    else if (code) return evel.Function("return ("+code+");")();
 };
 
 evel._supportsStrict = function () {
