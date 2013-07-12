@@ -78,11 +78,10 @@ evel.Function = function () {
         sbx.style.display = 'none';
         document.documentElement.appendChild(sbx);
         var _gObj = sbx.contentWindow,
-            _Function = _gObj.Function;
-        document.documentElement.removeChild(sbx);
-        
-        var wrapper = evel._globalNames(_gObj);
+            _Function = _gObj.Function,
+            wrapper = evel._globalNames(_gObj);
         wrapper.push(src);
+        document.documentElement.removeChild(sbx);
         return _Function.apply(null, wrapper).call({
             ctx: (this !== evel._global) ? this : null,
             args: arguments
