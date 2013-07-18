@@ -54,7 +54,7 @@ To avoid this, you could design *your* code to work asyncronously and use `evel`
 
 ### Unproven
 
-While I can't think of any other ways to subvert it … maybe someone else will think of more?
+While I can't think of any other ways to subvert it … maybe someone else will think of more? See the list of [known bypasses](https://github.com/natevw/evel/issues?labels=bypass) in the issue tracker.
 
 
 ## MIT license
