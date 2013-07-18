@@ -59,6 +59,8 @@ Known issues:
 <ul>
     <li>JavaScript globals are intentionally exposed, as they should not be exploitable.
     <li>Can't prevent infinite loops. Credit: <a href="http://dominictarr.com/">Dominic Tarr</a>
+    <li>Constructor-based leaking in IE. Credit: <a href="https://github.com/natevw/evel/issues/10">Mario Heiderich</a>
+    <li><code>Function("return this")()</code> === ouch. Credit: <a href="https://twitter.com/wisecwisec/status/357861675782770689">Stefano Di Paola</a>
     <li style="font-style: italic">clever exploit here?
 </ul>
 
