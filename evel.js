@@ -72,7 +72,13 @@ evel.Function = function () {
     can't prevent access to shared prototypes of e.g. objects/arrays/regexes while still keeping the function calls synchronous.
     Since we run in a separate frame, this is less likely a problem, but browser add-ons could potentially expose "useful" stuff. */
     
-    var src = "\"use strict\"; var fn = "+Function.apply(null, arguments).toString()+"; return fn.apply(this.ctx, this.args);";
+    // Use strict directive
+    var src = "\"use strict\";"
+    // Protect against "Function.constructor" and related attacks
+    src += "Function.constructor = Function;"
+    src += "[].slice.constructor.prototype.constructor = Function;"
+    // Build internal function declaration
+    src += "var fn = "+Function.apply(null, arguments).toString()+"; return fn.apply(this.ctx, this.args);";
     return function () {
         "use strict";       // avoids boxing of this callee's own `this`
         
