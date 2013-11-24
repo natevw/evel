@@ -1,4 +1,6 @@
-var evel = function (code) {
+if (typeof exports === 'object') module.exports = evel; // node.js module support
+
+function evel(code) {
     if (typeof code !== 'string') return code;
     else if (code) return evel.Function("return ("+code+");")();
 };
