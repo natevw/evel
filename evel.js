@@ -1,4 +1,6 @@
-var evel = function (code) {
+if (typeof exports === 'object') module.exports = evel; // node.js module support
+
+function evel(code) {
     if (typeof code !== 'string') return code;
     else if (code) return evel.Function("return ("+code+");")();
 };
@@ -83,6 +85,12 @@ evel.Function = function () {
             wrapper = evel._globalNames(_gObj);
         wrapper.push(src);
         document.documentElement.removeChild(sbx);
+        // Modify Globals
+        _gObj.Function.constructor.prototype.constructor = evel.Function;
+        _gObj.Function = evel.Function;
+        _gObj.Function.constructor = evel.Function;
+        _gObj.eval = evel;
+        // Build Function
         return _Function.apply(null, wrapper).call({
             ctx: (this !== evel._global) ? this : null,
             args: arguments
