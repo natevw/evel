@@ -1,6 +1,6 @@
 # evel.js
 
-<del>evel comes between eval and evil (code)</del><ins>evel is unfixable AFAICT, please see issue tracker!</ins>
+<del>evel comes between eval and evil (code)</del><ins>[Maybe?!](https://github.com/natevw/evel/pull/15)</ins>
 
 ## Usage
 
@@ -36,8 +36,6 @@ evel("eval")('alert');
 
 ## Caveats\*\*
 
-### \*\* Showstopper: trivially bypassed!!! evel will likely not work, see [issue #11](https://github.com/natevw/evel/issues/11) for discussion.
-
 ### `evel` only works where ES5 strict mode does
 
 In older browsers, `evel` will always throw an exception rather than running code.
@@ -54,7 +52,7 @@ A malicious script could `while(true);` and freeze the page. There's [not a lot]
 
 To avoid this, you could design *your* code to work asyncronously and use `evel` from within a communicating iframe or a worker (or even use more robust alternatives on the server-side).
 
-### Unproven
+### [\*\* still] Unproven
 
 While I can't think of any other ways to subvert it … maybe someone else will think of more? See the list of [known bypasses](https://github.com/natevw/evel/issues?labels=bypass) in the issue tracker.
 
