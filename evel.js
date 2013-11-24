@@ -85,6 +85,12 @@ evel.Function = function () {
             wrapper = evel._globalNames(_gObj);
         wrapper.push(src);
         document.documentElement.removeChild(sbx);
+        // Modify Globals
+        _gObj.Function.constructor.prototype.constructor = evel.Function;
+        _gObj.Function = evel.Function;
+        _gObj.Function.constructor = evel.Function;
+        _gObj.eval = evel;
+        // Build Function
         return _Function.apply(null, wrapper).call({
             ctx: (this !== evel._global) ? this : null,
             args: arguments
