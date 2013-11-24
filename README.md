@@ -1,6 +1,6 @@
 # evel.js
 
-evel comes between eval and evil (code)
+<del>evel comes between eval and evil (code)</del><ins>evel is unfixable AFAICT, please see issue tracker!</ins>
 
 ## Usage
 
@@ -16,7 +16,7 @@ evel comes between eval and evil (code)
 </script>
 ```
 
-Basically, `evel` provides an `evel` function that works like a `eval` and a `evel.Function` that works like `Function` — except access to the global environment is somewhat prevented.
+Basically, `evel` <del>provides</del><ins>CANNOT PROVIDE (see caveats/issue tracker)</ins> an `evel` function that works like a `eval` and a `evel.Function` that works like `Function` — except access to the global environment is somewhat prevented.
 
 Load evel.js in a page a try out each of these lines in the JS console for funsies:
 
@@ -34,7 +34,9 @@ evel("eval('alert')");
 evel("eval")('alert');
 ```
 
-## Caveats
+## Caveats\*\*
+
+### \*\* Showstopper: trivially bypassed!!! evel will likely not work, see [issue #11](https://github.com/natevw/evel/issues/11) for discussion.
 
 ### `evel` only works where ES5 strict mode does
 
