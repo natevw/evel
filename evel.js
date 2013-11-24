@@ -1,4 +1,6 @@
-var evel = function (code) {
+if (typeof exports === 'object') module.exports = evel; // node.js module support
+
+function evel(code) {
     if (typeof code !== 'string') return code;
     else if (code) return evel.Function("return ("+code+");")();
 };
@@ -11,7 +13,8 @@ evel._supportsStrict = function () {
 
 evel._jsGlobals = function () {
     // via https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects#Standard_global_objects_(alphabetically)
-    var names = "Array,ArrayBuffer,Boolean,Collator,DataView,Date,DateTimeFormat,decodeURI,decodeURIComponent,encodeURI,encodeURIComponent,Error,eval,EvalError,Float32Array,Float64Array,Function,Infinity,Intl,Int16Array,Int32Array,Int8Array,isFinite,isNaN,Iterator,JSON,Math,NaN,Number,NumberFormat,Object,parseFloat,parseInt,RangeError,ReferenceError,RegExp,StopIteration,String,SyntaxError,TypeError,Uint16Array,Uint32Array,Uint8Array,Uint8ClampedArray,undefined,uneval,URIError";
+    // 'Function' removed from this whitelist for overwriting to evel.Function
+    var names = "Array,ArrayBuffer,Boolean,Collator,DataView,Date,DateTimeFormat,decodeURI,decodeURIComponent,encodeURI,encodeURIComponent,Error,eval,EvalError,Float32Array,Float64Array,Infinity,Intl,Int16Array,Int32Array,Int8Array,isFinite,isNaN,Iterator,JSON,Math,NaN,Number,NumberFormat,Object,parseFloat,parseInt,RangeError,ReferenceError,RegExp,StopIteration,String,SyntaxError,TypeError,Uint16Array,Uint32Array,Uint8Array,Uint8ClampedArray,undefined,uneval,URIError";
     var jsGlobals = Object.create(null);
     names.split(',').filter(function (k) { return k in this; }).forEach(function (k) { jsGlobals[k] = void 0; });
     return jsGlobals;
@@ -69,7 +72,13 @@ evel.Function = function () {
     can't prevent access to shared prototypes of e.g. objects/arrays/regexes while still keeping the function calls synchronous.
     Since we run in a separate frame, this is less likely a problem, but browser add-ons could potentially expose "useful" stuff. */
     
-    var src = "\"use strict\"; var fn = "+Function.apply(null, arguments).toString()+"; return fn.apply(this.ctx, this.args);";
+    // Use strict directive
+    var src = "\"use strict\";"
+    // Protect against "Function.constructor" and related attacks
+    src += "Function.constructor = Function;"
+    src += "[].slice.constructor.prototype.constructor = Function;"
+    // Build internal function declaration
+    src += "var fn = "+Function.apply(null, arguments).toString()+"; return fn.apply(this.ctx, this.args);";
     return function () {
         "use strict";       // avoids boxing of this callee's own `this`
         
@@ -83,9 +92,14 @@ evel.Function = function () {
             wrapper = evel._globalNames(_gObj);
         wrapper.push(src);
         document.documentElement.removeChild(sbx);
-        return _Function.apply(null, wrapper).call({
+        var globalOverrides = [];
+        // overwrite `Function` global
+        var fnIdx = wrapper.indexOf('Function');
+        globalOverrides[fnIdx] = evel.Function;
+        // construct function with specified globals
+        return _Function.apply(null, wrapper).apply({
             ctx: (this !== evel._global) ? this : null,
             args: arguments
-        });
+        },globalOverrides);
     };
 };
