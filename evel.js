@@ -90,6 +90,7 @@ evel.Function = function () {
         _gObj.Function = evel.Function;
         _gObj.Function.constructor = evel.Function;
         _gObj.eval = evel;
+        _gObj.eval.constructor = evel.Function;
         // Build Function
         return _Function.apply(null, wrapper).call({
             ctx: (this !== evel._global) ? this : null,
