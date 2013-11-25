@@ -54,7 +54,8 @@ evel.Function = function () {
         1. Sanitizing the provided source (immediately, which also serves to flag syntax errors at expected time)
         2. Wrapping source in a "use strict";` environment to eliminate global access via `this` tricks
         3. Shadowing all non-ES5 globals† (each time called!) to eliminate direct access via name
-        4. …doing the last two steps from a new iframe's JS environment
+        4. Replacing direct/indirect access to ES5's function stuff, as they allow global access
+        5. …doing the last three steps from a new iframe's JS environment
     
     Basically instead of returning the provided code directly, we wrap it like this:
     
@@ -84,17 +85,17 @@ evel.Function = function () {
             _Function = _gObj.Function,
             wrapper = evel._globalNames(_gObj);
         wrapper.push(src);
-        document.documentElement.removeChild(sbx);
-        // Modify Globals
-        _gObj.Function.prototype.constructor = evel.Function;
-        _gObj.Function = evel.Function;
-        _gObj.Function.constructor = evel.Function;
         _gObj.eval = evel;
-        _gObj.eval.constructor = evel.Function;
-        // Build Function
+        _gObj.Function = evel.Function;                         // avoid direct accesses (must be done while sbx in DOM!)
+        document.documentElement.removeChild(sbx);
+        _Function.prototype.constructor = evel.Function;        // avoid prototypical Function accesss
+        
         return _Function.apply(null, wrapper).call({
             ctx: (this !== evel._global) ? this : null,
             args: arguments
         });
     };
 };
+
+Object.getPrototypeOf(evel).constructor = evel.Function;
+Object.getPrototypeOf(evel.Function).constructor = evel.Function;
