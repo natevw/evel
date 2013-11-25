@@ -1,6 +1,8 @@
 # evel.js
 
-<del>evel comes between eval and evil (code)</del><ins>[Maybe?!](https://github.com/natevw/evel/pull/15)</ins>
+evel comes between eval and evil (code)
+
+[see caveats below]
 
 ## Usage
 
@@ -50,11 +52,11 @@ Credit: [Dominic Tarr](https://github.com/dominictarr)
 
 A malicious script could `while(true);` and freeze the page. There's [not a lot](http://en.wikipedia.org/wiki/Halting_problem) we could do about this while still allowing syncronous return values. This a denial of service attack: it doesn't directly give the attacker much, but it does break the user experience.
 
-To avoid this, you could design *your* code to work asyncronously and use `evel` from within a communicating iframe or a worker (or even use more robust alternatives on the server-side).
+To avoid this, you could design *your* code to work asyncronously and maybe use `evel` from within a communicating iframe or a worker (or even use more robust alternatives on the server-side). See [issue #9](https://github.com/natevw/evel/issues/9) for discussion.
 
 ### [\*\* still] Unproven
 
-While I can't think of any other ways to subvert it … maybe someone else will think of more? See the list of [known bypasses](https://github.com/natevw/evel/issues?labels=bypass) in the issue tracker.
+While I can't think of any other [new] ways to subvert it … maybe someone else will think of more? See the list of [known bypasses](https://github.com/natevw/evel/issues?labels=bypass) in the issue tracker.
 
 
 ## MIT license
