@@ -86,7 +86,7 @@ evel.Function = function () {
         wrapper.push(src);
         document.documentElement.removeChild(sbx);
         // Modify Globals
-        _gObj.Function.constructor.prototype.constructor = evel.Function;
+        _gObj.Function.prototype.constructor = evel.Function;
         _gObj.Function = evel.Function;
         _gObj.Function.constructor = evel.Function;
         _gObj.eval = evel;
