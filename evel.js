@@ -23,7 +23,28 @@ if (0) {        // enable for debugging?
     evel._jsGlobals['console'] = void 0;
 }
 
-evel._global = function () { return this || window; }.call(null);         // NOTE: we fallback to `window` in case someone puts *us* into strict mode
+Object.defineProperty(evel, "_global", {
+    get: function () {
+	if (this._evel) {
+	    var o = {};
+	    Object.getOwnPropertyNames(this).forEach(function (k) { o[k] = this[k]; });
+	    if (o._eval) delete o.eval._global;
+	    return o;
+	}
+	delete this._evel;
+	return function() {
+	    if(this) {
+		if(!this.evel._evel) Object.defineProperty(this.evel, "_evel", { value: true });
+		var o = {};
+		Object.getOwnPropertyNames(this).forEach(function (k) { o[k] = this[k]; });
+		return o;
+	    } else {
+		// NOTE: we fallback to `window` in case someone puts *us* into strict mode
+		return this || window;
+	    }
+	}.call(null);
+    }
+});
 
 evel._globalNames = function (gObj) {
     var globals = Object.create(null),
