@@ -5,13 +5,15 @@ function evel(code) {
     else if (code) return evel.Function("return ("+code+");")();
 };
 
-evel._supportsStrict = function () {
+var evel_ = {};
+
+evel_.supportsStrict = function () {
     "use strict";           // _should_ prevent global access via `this`
     function test() { return function () { return eval("this"); }.call(this); }
     return (test.call(null) === null);
 };
 
-evel._jsGlobals = function () {
+evel_.jsGlobals = function () {
     // via https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects#Standard_global_objects_(alphabetically)
     var names = "Array,ArrayBuffer,Boolean,Collator,DataView,Date,DateTimeFormat,decodeURI,decodeURIComponent,encodeURI,encodeURIComponent,Error,eval,EvalError,Float32Array,Float64Array,Function,Infinity,Intl,Int16Array,Int32Array,Int8Array,isFinite,isNaN,Iterator,JSON,Math,NaN,Number,NumberFormat,Object,parseFloat,parseInt,RangeError,ReferenceError,RegExp,StopIteration,String,SyntaxError,TypeError,Uint16Array,Uint32Array,Uint8Array,Uint8ClampedArray,undefined,uneval,URIError";
     var jsGlobals = Object.create(null);
@@ -20,35 +22,35 @@ evel._jsGlobals = function () {
 }();
 
 if (0) {        // enable for debugging?
-    evel._jsGlobals['console'] = void 0;
+    evel_.jsGlobals['console'] = void 0;
 }
 
-evel._global = function () { return this || window; }.call(null);         // NOTE: we fallback to `window` in case someone puts *us* into strict mode
+evel_.global = function () { return this || window; }.call(null);         // NOTE: we fallback to `window` in case someone puts *us* into strict mode
 
-evel._globalNames = function (gObj) {
+evel_.globalNames = function (gObj) {
     var globals = Object.create(null),
-        proto = gObj || evel._global;
+        proto = gObj || evel_.global;
     while (proto) {
         // NOTE: there are some issues with getOwnPropertyNames, e.g. https://code.google.com/p/v8/issues/detail?id=2764
         Object.getOwnPropertyNames(proto).forEach(function (k) { globals[k] = void 0; });
         proto = Object.getPrototypeOf(proto);
     }
     // NOTE: every name on global may not be a valid identifier! http://mathiasbynens.be/notes/javascript-identifiers
-    var cache = evel._globalNames.memoizedFilterResults;
+    var cache = evel_.globalNames.memoizedFilterResults;
     return Object.keys(globals).filter(function (k) {
         if (k in cache) return cache[k];
         if (window.dbg) console.log('k', k);
-        var valid = (k in evel._jsGlobals) ? false : true;
+        var valid = (k in evel_.jsGlobals) ? false : true;
         if (valid) try { Function(k, ""); } catch (e) { valid = false; }
         return (cache[k] = valid);
     });
 };
-evel._globalNames.memoizedFilterResults = Object.create(null);
-evel._globalNames();        // warm the cache
+evel_.globalNames.memoizedFilterResults = Object.create(null);
+evel_.globalNames();        // warm the cache
 
 
 evel.Function = function () {
-    if (!evel._supportsStrict()) throw Error("This browser does not support sandboxed code execution.");
+    if (!evel_.supportsStrict()) throw Error("This browser does not support sandboxed code execution.");
     /* This works by:
     
         1. Sanitizing the provided source (immediately, which also serves to flag syntax errors at expected time)
@@ -83,7 +85,7 @@ evel.Function = function () {
         document.documentElement.appendChild(sbx);
         var _gObj = sbx.contentWindow,
             _Function = _gObj.Function,
-            wrapper = evel._globalNames(_gObj);
+            wrapper = evel_.globalNames(_gObj);
         wrapper.push(src);
         _gObj.eval = evel;
         _gObj.Function = evel.Function;                         // avoid direct accesses (must be done while sbx in DOM!)
@@ -91,7 +93,7 @@ evel.Function = function () {
         _Function.prototype.constructor = evel.Function;        // avoid prototypical Function accesss
         
         return _Function.apply(null, wrapper).call({
-            ctx: (this !== evel._global) ? this : null,
+            ctx: (this !== evel_.global) ? this : null,
             args: arguments
         });
     };
