@@ -1,0 +1,31 @@
+{
+  "name": "evel",
+  "version": "0.3.0",
+  "description": "Unproven tiny library to sandbox untrusted JS code. IMPORTANT: intended for [cautious] browser-side use only, much better alternatives on other platforms!",
+  "main": "evel.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "browserify test/*.js | testling -x open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/natevw/evel.git"
+  },
+  "keywords": [
+    "sandbox"
+  ],
+  "author": "Nathan Vander Wilt",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/natevw/evel/issues"
+  },
+  "homepage": "https://github.com/natevw/evel",
+  "devDependencies": {
+    "browserify": "^8.1.3",
+    "tap": "^0.5.0",
+    "tape": "^3.5.0",
+    "testling": "^1.7.1"
+  }
+}
