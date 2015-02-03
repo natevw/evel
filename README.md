@@ -52,7 +52,7 @@ Credit: [Dominic Tarr](https://github.com/dominictarr)
 
 A malicious script could `while(true);` and freeze the page. There's [not a lot](http://en.wikipedia.org/wiki/Halting_problem) we could do about this while still allowing syncronous return values. This a denial of service attack: it doesn't directly give the attacker much, but it does break the user experience.
 
-To avoid this, you could design *your* code to work asyncronously and maybe use `evel` from within a communicating iframe or a worker (or even use more robust alternatives on the server-side). See [issue #9](https://github.com/natevw/evel/issues/9) for discussion.
+To avoid this, you could design *your* code to work asyncronously and maybe use `evel` from within a communicating [worker](http://dev.w3.org/html5/workers/) or something — but at that point consider using even more robust alternatives on the server-side if it makes sense for your application.
 
 ### [\*\* still] Unproven
 
