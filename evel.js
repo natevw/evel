@@ -1,11 +1,4 @@
-if (typeof exports === 'object') module.exports = evel; // node.js module support
-
-function evel(code) {
-    if (typeof code !== 'string') return code;
-    else if (code) return evel.Function("return ("+code+");")();
-};
-
-var evel_ = {};
+var evel_ = {};       // internal methods go here
 
 evel_.supportsStrict = function () {
     "use strict";           // _should_ prevent global access via `this`
@@ -48,6 +41,13 @@ evel_.globalNames = function (gObj) {
 evel_.globalNames.memoizedFilterResults = Object.create(null);
 evel_.globalNames();        // warm the cache
 
+
+// Public interface — BE CAREFUL what you expose here — it is available to sandboxed code too!
+
+function evel(code) {
+    if (typeof code !== 'string') return code;
+    else if (code) return evel.Function("return ("+code+");")();
+}
 
 evel.Function = function () {
     if (!evel_.supportsStrict()) throw Error("This browser does not support sandboxed code execution.");
@@ -101,3 +101,5 @@ evel.Function = function () {
 
 Object.getPrototypeOf(evel).constructor = evel.Function;
 Object.getPrototypeOf(evel.Function).constructor = evel.Function;
+
+if (typeof exports === 'object') module.exports = evel; // CommonJS module support (e.g. browserify)
